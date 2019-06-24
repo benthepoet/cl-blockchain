@@ -5,7 +5,9 @@
 |#
 
 (defpackage #:cl-blockchain
-  (:use #:cl #:ironclad)
+  (:use
+   #:cl
+   #:ironclad)
   (:export
    #:make-block))
 
@@ -19,10 +21,13 @@
     :initarg :hash
     :accessor hash)))
 
+(defun hash-block (timestamp)
+  (let ((data (ironclad:integer-to-octets timestamp)))
+    (ironclad:byte-array-to-hex-string
+     (ironclad:digest-sequence :sha256 data))))
+
 (defun make-block ()
-  (let* ((timestamp (get-universal-time))
-         (data (make-array 8 :element-type '(unsigned-byte 8)))
-         (hash (ironclad:digest-sequence :sha256 data)))
+  (let* ((timestamp (get-universal-time)))
     (make-instance 'block-object
                    :timestamp timestamp
-                   :hash hash)))
+                   :hash (hash-block timestamp))))
