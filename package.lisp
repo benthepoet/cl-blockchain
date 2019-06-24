@@ -41,7 +41,7 @@
      (ironclad:digest-sequence :sha256 data))))
 
 (defun make-block (message previous-hash)
-  (let* ((timestamp (get-universal-time)))
+  (let ((timestamp (get-universal-time)))
     (make-instance 'block-object
                    :timestamp timestamp
                    :hash (hash-block timestamp message previous-hash)
