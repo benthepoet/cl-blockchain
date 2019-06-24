@@ -22,27 +22,31 @@
    (hash
     :initarg :hash
     :accessor hash)
+   (message
+    :initarg :message
+    :accessor message)
    (previous-hash
     :initarg :previous-hash
     :accessor previous-hash)))
 
-(defun add-block (chain)
+(defun add-block (chain message)
   (let* ((last-block (car chain))
-         (new-block (make-block (hash last-block))))
+         (new-block (make-block message (hash last-block))))
     (append (list new-block) chain)))
 
-(defun hash-block (timestamp previous-hash)
+(defun hash-block (timestamp message previous-hash)
   (let ((data (ironclad:ascii-string-to-byte-array
-               (format nil "~d~A" timestamp previous-hash))))
+               (format nil "~d~A~A" timestamp message previous-hash))))
     (ironclad:byte-array-to-hex-string
      (ironclad:digest-sequence :sha256 data))))
 
-(defun make-block (previous-hash)
+(defun make-block (message previous-hash)
   (let* ((timestamp (get-universal-time)))
     (make-instance 'block-object
                    :timestamp timestamp
-                   :hash (hash-block timestamp previous-hash)
+                   :hash (hash-block timestamp message previous-hash)
+                   :message message
                    :previous-hash previous-hash)))
 
 (defun make-chain ()
-  (list (make-block nil)))
+  (list (make-block "Genesis Block" nil)))
